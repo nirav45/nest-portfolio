@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronService } from './cron/cron.service';
 import { ConfigModule } from '@nestjs/config';
+import { PortfolioModule } from './portfolio/portfolio.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
     AdminModule,
     AuthModule,
     DatabaseModule,
+    PortfolioModule,
     ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
@@ -21,4 +23,4 @@ import { ConfigModule } from '@nestjs/config';
   ],
   providers: [CronService],
 })
-export class AppModule {}
+export class AppModule { }
