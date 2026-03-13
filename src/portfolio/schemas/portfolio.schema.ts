@@ -15,8 +15,11 @@ class Project {
     @Prop({ required: true })
     longDescription: string;
 
-    @Prop({ required: true })
-    image: string;
+    @Prop({ required: false })
+    image?: string;
+
+    @Prop([String])
+    images: string[];
 
     @Prop([String])
     techStack: string[];

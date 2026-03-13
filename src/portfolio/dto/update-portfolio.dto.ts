@@ -19,9 +19,16 @@ class ProjectDto {
     @IsString()
     longDescription: string;
 
-    @ApiProperty()
+    @ApiProperty({ required: false })
+    @IsOptional()
     @IsString()
-    image: string;
+    image?: string;
+
+    @ApiProperty({ type: [String], required: false })
+    @IsOptional()
+    @IsArray()
+    @IsString({ each: true })
+    images?: string[];
 
     @ApiProperty({ type: [String] })
     @IsArray()

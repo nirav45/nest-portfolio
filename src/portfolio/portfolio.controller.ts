@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Controller,
     Get,
     Post,
@@ -9,6 +10,7 @@ import {
     UploadedFile,
     UseInterceptors,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PortfolioService } from './portfolio.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../guards/role.guard';
@@ -18,6 +20,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiConsumes, ApiBody, ApiResponse
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SupabaseService } from './supabase.service';
 import { UpdatePortfolioDto } from './dto/update-portfolio.dto';
+import { CommonService } from '../common/common.service';
 
 @ApiTags('portfolio')
 @Controller('portfolio')
@@ -25,6 +28,8 @@ export class PortfolioController {
     constructor(
         private readonly portfolioService: PortfolioService,
         private readonly supabaseService: SupabaseService,
+        private readonly commonService: CommonService,
+        private readonly configService: ConfigService,
     ) { }
 
     @ApiOperation({ summary: 'Get portfolio details' })
@@ -80,7 +85,15 @@ export class PortfolioController {
         @UploadedFile() file: Express.Multer.File,
         @Body('projectId') projectId: string,
     ) {
-        const url = await this.supabaseService.uploadFile(file);
+        const storageProvider = (this.configService.get<string>('STORAGE_PROVIDER') || 'supabase').toLowerCase();
+        if (storageProvider === 's3' && !projectId?.trim()) {
+            throw new BadRequestException('projectId is required when STORAGE_PROVIDER is set to s3');
+        }
+
+        const url = storageProvider === 's3'
+            ? (await this.commonService.uploadFileToS3(file, projectId.trim())).fileUrl
+            : await this.supabaseService.uploadFile(file);
+
         if (projectId) {
             try {
                 await this.portfolioService.updateProjectImage(projectId, url);

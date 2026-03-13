@@ -29,7 +29,10 @@ export class PortfolioService {
     async updateProjectImage(projectId: string, imageUrl: string): Promise<Portfolio> {
         const portfolio = await this.portfolioModel.findOneAndUpdate(
             { 'projects.id': projectId },
-            { $set: { 'projects.$.image': imageUrl } },
+            { 
+                $set: { 'projects.$.image': imageUrl },
+                $push: { 'projects.$.images': imageUrl }
+            },
             { new: true },
         ).exec();
 

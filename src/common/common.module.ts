@@ -10,4 +10,4 @@ import { OneSignalService } from './one-signal.service';
   providers: [CommonService, ScheduleJobService, OneSignalService],
   exports: [CommonService, ScheduleJobService, OneSignalService],
 })
-export class CommonModule {}
+export class CommonModule { }
